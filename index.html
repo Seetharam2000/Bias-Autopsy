@@ -469,14 +469,12 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
     updateUserChip(user);
-    // If on login page, go to landing
-    if (!document.getElementById('page-login').classList.contains('active') ||
-        document.getElementById('page-login').classList.contains('active')) {
-      showPage('landing');
-    }
+    showPage('landing');
   } else {
     currentUser = null;
-    showPage('login');
+    // Force show login, bypassing the guard
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-login').classList.add('active');
   }
 });
 
@@ -693,7 +691,7 @@ async function startAnalysis() {
 }
 
 // ─── GEMINI API CALL ───────────────────────────────────────
-const GEMINI_KEY = 'AIzaSyCWTEr3vJoV8TL7L2-f7BAyKmnf3M4Htsk';
+const GEMINI_KEY = 'AQ.Ab8RN6JIhb2hD5FCxBqe6WScbsDIaRifZ25LDvz6SSNKr-IZQg';
 
 async function callClaudeForBiasAnalysis(dataPreview, filename, rows, cols) {
   const prompt = `You are a world-class dataset bias analyst. Analyze the following dataset and return a structured bias autopsy report.
@@ -742,7 +740,7 @@ Rules:
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_KEY },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.2, maxOutputTokens: 2048 }
